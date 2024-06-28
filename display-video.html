@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Dogs See!</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <style>
+        /* Define global styles for the body */
+        body {
+            font-family: 'Lato', fallback, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-image: url('paw.jpg');
+            background-repeat: repeat;
+        }
+
+        /* Style for the video container */
+        #videoContainer {
+            position: relative;
+            width: 80%;
+            max-width: 800px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.192);
+            margin-bottom: 20px;
+        }
+
+        /* Styles for the video element */
+        video {
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+        }
+
+        /* Styles for the canvas element */
+        canvas {
+            display: block;
+        }
+
+        /* Error message styling */
+       .error-message {
+            position: relative;
+            color: rgb(223, 46, 46);
+            font-size: 40px;
+            text-shadow: 2px 2px 4px rgb(173, 18, 18);
+        }
+
+        /* Heading styles */
+        body h1 {
+            font-size: 60px;
+            text-shadow: 1px 1px 3px rgb(75, 75, 75);
+            margin-bottom: 10px;
+        }
+
+        body h2 {
+            font-size: 25px;
+            margin-left: 5%;
+            margin-right: 5%;
+            justify-content: center;
+        }
+
+        /* Additional box styles */
+       .white-box {
+            display: inline-block;
+            background-color: white;
+            color: black;
+            padding: 10px;
+            border-radius: 15px;
+        }
+       .gray-box {
+            display: flex;
+            background-color: rgb(36, 36, 36);
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.192);
+            width: 80%;
+            max-width: 800px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.192);
+            margin-bottom: 20px;
+            height: 400px;
+            justify-content: center;
+            align-items: center;
+        }
+        .content-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px; /* Adjust spacing as needed */
+        }
+        #fullscreenButton {
+        position: absolute;
+        bottom: 10px; /* Adjust based on your design */
+        right: 10px; /* Adjust based on your design */
+        z-index: 10; /* Ensure it's above other elements */
+        cursor: pointer;
+        background: none;
+        border: none;
+        font-size: 24px; /* Adjust based on your design */
+        color: white; /* Adjust based on your design */
+        }
+    </style>
+</head>
+<body>
+    <div class="content-container">
+        <h1>How Dogs See🐶</h1>
+        <h2 class="white-box">Dogs experience a form of red-green color blindness known as deuteranopia, which means they have difficulty distinguishing between certain shades of green and red. 
+            Additionally, their vision is characterized by decreased brightness discrimination, making it harder for them to perceive differences in light intensity, and they also suffer from some degree of blurriness due to the structure of their eyes, which results in a less detailed view of the world compared to humans.</h2>
+        <p class="error-message gray-box" style="display:none;">Unable to access camera.</p>
+    </div>
+    <div id="videoContainer">
+        <button id="fullscreenButton" title="Toggle Fullscreen Mode">&#x26F6;</button>
+    </div>
+
+    <script>
+        // Event listener for DOM content loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            const videoContainer = document.getElementById('videoContainer');
+            let videoElement = null;
+
+            // Request access to the user's webcam
+            navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function(stream) {
+                    videoElement = document.createElement('video');
+                    videoElement.srcObject = stream;
+                    videoElement.play();
+
+                    // Apply default filter and adjust video size
+                    videoElement.style.filter = `url('filter.svg#deuteranopia') blur(5px) brightness(50%)`;
+                    videoElement.style.width = '100%';
+                    videoElement.style.height = 'auto';
+                    // Append video element to container
+                    videoContainer.appendChild(videoElement);
+
+                    // Cleanup function to stop video stream
+                    return () => {
+                        if (videoElement && videoElement.srcObject) {
+                            videoElement.srcObject.getTracks().forEach(track => track.stop());
+                        }
+                    };
+                
+                })
+            .catch(function(err) {
+                    console.error('An error occurred: ' + err);
+                    document.querySelector('.error-message').style.display = 'flex';
+                    // Cleanup function to stop video stream
+                    return () => {
+                        if (videoElement && videoElement.srcObject) {
+                            videoElement.srcObject.getTracks().forEach(track => track.stop());
+                        }
+                    }; 
+                
+                });
+            // Get the fullscreen button
+            const fullscreenButton = document.getElementById('fullscreenButton');
+
+            // Function to toggle fullscreen mode
+            function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                videoElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // Attach the toggleFullscreen function to the fullscreen button
+        fullscreenButton.addEventListener('click', toggleFullscreen);
+
+        });
+    
+    </script>
+</body>
+</html>
